@@ -1,10 +1,11 @@
-// Canvas renderer: the VEX field as a brass-framed night chart.
-// Field frame: origin at center, +x right, +y up, inches.
+// Canvas renderer: the game field with the robot, trails and targets.
+// Field frame: origin at center, +x right, +y up, inches. The background
+// image is the 12'x12' playing surface, so -72..72 maps edge to edge.
 
 import type { World } from '../sim/world.ts';
 
 const FIELD = 144; // inches
-const MARGIN = 10; // inches of breathing room around the perimeter
+const MARGIN = 6; // inches of breathing room around the perimeter
 
 export interface FieldTarget {
   x: number;
@@ -19,10 +20,12 @@ export class FieldView {
 
   private ctx: CanvasRenderingContext2D;
   private size = 0;
+  private fieldImg = new Image();
 
   constructor(canvas: HTMLCanvasElement) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d')!;
+    this.fieldImg.src = '/field.jpg';
     const observer = new ResizeObserver(() => this.resize());
     observer.observe(canvas.parentElement!);
     this.resize();
@@ -59,10 +62,9 @@ export class FieldView {
 
   render(world: World, timeMs: number): void {
     const ctx = this.ctx;
-    const s = this.scale;
     ctx.clearRect(0, 0, this.size, this.size);
 
-    this.drawField(ctx, s);
+    this.drawField(ctx);
     if (this.showTrails) this.drawTrails(ctx, world);
     if (this.target) this.drawTarget(ctx, this.target, timeMs);
 
@@ -74,22 +76,22 @@ export class FieldView {
     this.drawRobot(ctx, world.robot.x, world.robot.y, world.robot.theta, world, false);
   }
 
-  private drawField(ctx: CanvasRenderingContext2D, s: number): void {
+  private drawField(ctx: CanvasRenderingContext2D): void {
+    const s = this.scale;
     const [left, top] = this.toPx(-FIELD / 2, FIELD / 2);
     const sidePx = FIELD * s;
 
-    // foam tiles, subtly alternating like a checkerboard
-    for (let i = 0; i < 6; i++) {
-      for (let j = 0; j < 6; j++) {
-        ctx.fillStyle = (i + j) % 2 === 0 ? '#262012' : '#221c10';
-        ctx.fillRect(left + i * 24 * s, top + j * 24 * s, 24 * s, 24 * s);
-      }
+    if (this.fieldImg.complete && this.fieldImg.naturalWidth > 0) {
+      ctx.drawImage(this.fieldImg, left, top, sidePx, sidePx);
+    } else {
+      ctx.fillStyle = '#3a3d42';
+      ctx.fillRect(left, top, sidePx, sidePx);
     }
 
-    // tile seams
-    ctx.strokeStyle = 'rgba(202, 160, 74, 0.14)';
+    // faint 24" tile grid + center crosshair for coordinate reading
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.10)';
     ctx.lineWidth = 1;
-    for (let i = 0; i <= 6; i++) {
+    for (let i = 1; i < 6; i++) {
       ctx.beginPath();
       ctx.moveTo(left + i * 24 * s, top);
       ctx.lineTo(left + i * 24 * s, top + sidePx);
@@ -98,47 +100,18 @@ export class FieldView {
       ctx.stroke();
     }
 
-    // center axes, a navigator's crosshair
-    const [cx, cy] = this.toPx(0, 0);
-    ctx.strokeStyle = 'rgba(202, 160, 74, 0.30)';
-    ctx.setLineDash([2, 6]);
-    ctx.beginPath();
-    ctx.moveTo(left, cy);
-    ctx.lineTo(left + sidePx, cy);
-    ctx.moveTo(cx, top);
-    ctx.lineTo(cx, top + sidePx);
-    ctx.stroke();
-    ctx.setLineDash([]);
-
-    // axis labels
-    ctx.fillStyle = 'rgba(202, 160, 74, 0.55)';
-    ctx.font = `${Math.max(10, 11 * (s / 5))}px 'Cinzel', serif`;
-    ctx.textAlign = 'center';
-    ctx.fillText('+Y', cx + 12, top + 14);
-    ctx.fillText('+X', left + sidePx - 14, cy - 8);
-
-    // brass perimeter with corner rivets
-    ctx.strokeStyle = '#8a6420';
-    ctx.lineWidth = 5;
+    // perimeter
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.22)';
+    ctx.lineWidth = 1.5;
     ctx.strokeRect(left, top, sidePx, sidePx);
-    ctx.strokeStyle = '#c9972c';
-    ctx.lineWidth = 2;
-    ctx.strokeRect(left, top, sidePx, sidePx);
-    ctx.fillStyle = '#e0b54e';
-    for (const [rx, ry] of [
-      [left, top], [left + sidePx, top], [left, top + sidePx], [left + sidePx, top + sidePx],
-    ]) {
-      ctx.beginPath();
-      ctx.arc(rx, ry, 3.5, 0, Math.PI * 2);
-      ctx.fill();
-    }
   }
 
   private drawTrails(ctx: CanvasRenderingContext2D, world: World): void {
     const drawTrail = (trail: { x: number; y: number }[], style: string, dash: number[]) => {
       if (trail.length < 2) return;
       ctx.strokeStyle = style;
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 2.5;
+      ctx.lineJoin = 'round';
       ctx.setLineDash(dash);
       ctx.beginPath();
       const [x0, y0] = this.toPx(trail[0].x, trail[0].y);
@@ -151,27 +124,26 @@ export class FieldView {
       ctx.setLineDash([]);
     };
 
-    // odometry's belief: dashed brass. Ground truth: glowing copper
-    drawTrail(world.odomTrail, 'rgba(224, 181, 78, 0.55)', [5, 5]);
-    ctx.shadowColor = 'rgba(210, 138, 77, 0.8)';
-    ctx.shadowBlur = 6;
-    drawTrail(world.trueTrail, '#d28a4d', []);
-    ctx.shadowBlur = 0;
+    // odometry's belief: dashed blue. Ground truth: amber
+    drawTrail(world.odomTrail, 'rgba(96, 165, 250, 0.9)', [6, 5]);
+    drawTrail(world.trueTrail, '#f0b429', []);
   }
 
   private drawTarget(ctx: CanvasRenderingContext2D, target: FieldTarget, timeMs: number): void {
     const [x, y] = this.toPx(target.x, target.y);
-    const pulse = 8 + 3 * Math.sin(timeMs / 280);
-    ctx.strokeStyle = '#e0b54e';
-    ctx.lineWidth = 1.5;
+    const pulse = 9 + 2.5 * Math.sin(timeMs / 260);
+    ctx.strokeStyle = '#f0b429';
+    ctx.lineWidth = 2;
     ctx.beginPath();
     ctx.arc(x, y, pulse, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.9)';
+    ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.moveTo(x - 14, y);
-    ctx.lineTo(x + 14, y);
-    ctx.moveTo(x, y - 14);
-    ctx.lineTo(x, y + 14);
+    ctx.moveTo(x - 13, y);
+    ctx.lineTo(x + 13, y);
+    ctx.moveTo(x, y - 13);
+    ctx.lineTo(x, y + 13);
     ctx.stroke();
   }
 
@@ -191,11 +163,10 @@ export class FieldView {
     ctx.rotate(-thetaMath);
 
     if (ghost) {
-      // odometry ghost: hollow brass outline
-      ctx.globalAlpha = 0.55;
-      ctx.strokeStyle = '#e0b54e';
+      // odometry ghost: dashed blue outline
+      ctx.strokeStyle = 'rgba(96, 165, 250, 0.95)';
       ctx.lineWidth = 1.5;
-      ctx.setLineDash([4, 4]);
+      ctx.setLineDash([5, 4]);
       ctx.strokeRect(-l / 2, -w / 2, l, w);
       ctx.beginPath();
       ctx.moveTo(0, 0);
@@ -206,50 +177,50 @@ export class FieldView {
       return;
     }
 
-    // hull
-    const grad = ctx.createLinearGradient(0, -w / 2, 0, w / 2);
-    grad.addColorStop(0, '#7a5530');
-    grad.addColorStop(1, '#3c2a16');
-    ctx.fillStyle = grad;
-    ctx.strokeStyle = '#c9972c';
+    // drop shadow for lift off the field photo
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.45)';
+    ctx.shadowBlur = 8;
+    ctx.shadowOffsetY = 2;
+
+    // chassis body
+    ctx.fillStyle = 'rgba(18, 21, 27, 0.94)';
+    ctx.strokeStyle = '#f4f5f7';
     ctx.lineWidth = 2;
     ctx.beginPath();
-    ctx.roundRect(-l / 2, -w / 2, l, w, 3);
+    ctx.roundRect(-l / 2, -w / 2, l, w, 4);
     ctx.fill();
+    ctx.shadowColor = 'transparent';
     ctx.stroke();
 
     // wheels
-    ctx.fillStyle = '#17120a';
-    const wheelL = l * 0.28;
-    const wheelW = w * 0.14;
+    ctx.fillStyle = '#2c333d';
+    const wheelL = l * 0.26;
+    const wheelW = w * 0.13;
     for (const side of [-1, 1]) {
       for (const fore of [-1, 0, 1]) {
         ctx.beginPath();
         ctx.roundRect(
           fore * l * 0.31 - wheelL / 2,
-          side * (w / 2 - wheelW * 0.6) - wheelW / 2,
+          side * (w / 2 - wheelW * 0.62) - wheelW / 2,
           wheelL, wheelW, 2,
         );
         ctx.fill();
       }
     }
 
-    // bow arrow, pennant red like the logo's flag
-    ctx.fillStyle = '#8f2f25';
-    ctx.strokeStyle = '#e0b54e';
-    ctx.lineWidth = 1;
+    // heading wedge
+    ctx.fillStyle = '#f0b429';
     ctx.beginPath();
-    ctx.moveTo(l / 2 - 2, 0);
-    ctx.lineTo(l * 0.14, -w * 0.2);
-    ctx.lineTo(l * 0.14, w * 0.2);
+    ctx.moveTo(l / 2 - 3, 0);
+    ctx.lineTo(l * 0.12, -w * 0.2);
+    ctx.lineTo(l * 0.12, w * 0.2);
     ctx.closePath();
     ctx.fill();
-    ctx.stroke();
 
-    // brass hub rivet
-    ctx.fillStyle = '#e0b54e';
+    // center dot
+    ctx.fillStyle = '#f4f5f7';
     ctx.beginPath();
-    ctx.arc(0, 0, 2.5, 0, Math.PI * 2);
+    ctx.arc(0, 0, 2.2, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.restore();

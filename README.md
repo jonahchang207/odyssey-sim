@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="public/banner.svg" alt="Odyssey — odometry &amp; motion control for VEX V5" width="700">
+  <img src="public/logo.svg" alt="Odyssey logo" width="110">
 </p>
 
 <h1 align="center">Odyssey Simulator</h1>
@@ -38,8 +38,8 @@ parameters.
 
 ## Features
 
-- **Field view** — 12'×12' field with the robot's true path (copper) and
-  odometry's belief (dashed brass ghost + trail)
+- **Field view** — the 12'×12' game field with the robot's true path (amber)
+  and odometry's belief (dashed blue ghost + trail)
 - **Code editor** — write autonomous routines against the `chassis` API;
   bundled examples cover every motion type
 - **Tuning panel** — drivetrain geometry, lateral/angular PID, exit
