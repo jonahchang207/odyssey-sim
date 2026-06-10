@@ -116,6 +116,7 @@
         <aside class="panel plate">
           <div class="tabs" role="tablist">
             <button class="tab-btn active" data-tab="auto" role="tab" aria-selected="true">Autonomous</button>
+            <button class="tab-btn" data-tab="path" role="tab" aria-selected="false">Path planner</button>
             <button class="tab-btn" data-tab="tune" role="tab" aria-selected="false">Tuning</button>
           </div>
 
@@ -128,6 +129,28 @@
             <textarea id="code" class="mono" spellcheck="false" aria-label="Autonomous program code"></textarea>
             <div class="console-title" id="console-label">Console</div>
             <div id="console" class="console mono" role="log" aria-live="polite" aria-labelledby="console-label"></div>
+          </div>
+
+          <div id="tab-path" class="tab hidden">
+            <p class="path-hint">
+              Click the field to add waypoints. Drag a point to move it; right-click deletes it.
+              <strong>Pose</strong> waypoints also control the arrival heading.
+            </p>
+            <div class="path-toolbar">
+              <button id="path-run" class="btn primary small">
+                <svg aria-hidden="true"><use href="#i-play" /></svg>Simulate
+              </button>
+              <button id="path-clear" class="btn small">Clear</button>
+              <label class="control" for="path-timeout">Timeout
+                <input id="path-timeout" type="number" value="4000" step="500" min="500" /> ms
+              </label>
+            </div>
+            <div id="path-list" class="path-list"></div>
+            <div class="console-title path-code-title">
+              <span>Generated C++</span>
+              <button id="path-copy" class="btn small">Copy</button>
+            </div>
+            <pre id="path-code" class="mono path-code"></pre>
           </div>
 
           <div id="tab-tune" class="tab hidden">

@@ -3,6 +3,7 @@
 // image is the 12'x12' playing surface, so -72..72 maps edge to edge.
 
 import type { World } from '../sim/world.ts';
+import type { PathPoint } from './planner.ts';
 
 const FIELD = 144; // inches
 const MARGIN = 6; // inches of breathing room around the perimeter
@@ -17,6 +18,7 @@ export class FieldView {
   target: FieldTarget | null = null;
   showGhost = true;
   showTrails = true;
+  plannerPoints: PathPoint[] = [];
 
   private ctx: CanvasRenderingContext2D;
   private size = 0;
@@ -66,6 +68,7 @@ export class FieldView {
 
     this.drawField(ctx);
     if (this.showTrails) this.drawTrails(ctx, world);
+    if (this.plannerPoints.length > 0) this.drawPlannerPath(ctx);
     if (this.target) this.drawTarget(ctx, this.target, timeMs);
 
     // odometry's belief, drawn as a ghost under the true robot
@@ -127,6 +130,55 @@ export class FieldView {
     // odometry's belief: dashed blue. Ground truth: amber
     drawTrail(world.odomTrail, 'rgba(96, 165, 250, 0.9)', [6, 5]);
     drawTrail(world.trueTrail, '#f0b429', []);
+  }
+
+  private drawPlannerPath(ctx: CanvasRenderingContext2D): void {
+    const points = this.plannerPoints;
+
+    // connecting segments; backwards approaches are dashed
+    ctx.lineWidth = 2;
+    for (let i = 1; i < points.length; i++) {
+      const [x0, y0] = this.toPx(points[i - 1].x, points[i - 1].y);
+      const [x1, y1] = this.toPx(points[i].x, points[i].y);
+      ctx.strokeStyle = 'rgba(139, 92, 246, 0.85)';
+      ctx.setLineDash(points[i].forwards ? [] : [6, 5]);
+      ctx.beginPath();
+      ctx.moveTo(x0, y0);
+      ctx.lineTo(x1, y1);
+      ctx.stroke();
+    }
+    ctx.setLineDash([]);
+
+    points.forEach((p, i) => {
+      const [x, y] = this.toPx(p.x, p.y);
+      const isStart = i === 0;
+
+      // arrival-heading arrow for pose points (and the start heading)
+      if (isStart || p.kind === 'pose') {
+        const mathTheta = ((90 - p.theta) * Math.PI) / 180;
+        ctx.strokeStyle = '#8b5cf6';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x + 17 * Math.cos(mathTheta), y - 17 * Math.sin(mathTheta));
+        ctx.stroke();
+      }
+
+      ctx.fillStyle = isStart ? '#22b573' : '#8b5cf6';
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(x, y, 9, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.font = "600 10px 'JetBrains Mono', monospace";
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(isStart ? 'S' : String(i), x, y + 0.5);
+    });
+    ctx.textBaseline = 'alphabetic';
   }
 
   private drawTarget(ctx: CanvasRenderingContext2D, target: FieldTarget, timeMs: number): void {

@@ -8,6 +8,8 @@ import { ProgramStopped } from '../sim/clock.ts';
 import { World, defaultConfig, type WorldConfig } from '../sim/world.ts';
 import { examples } from '../examples.ts';
 import { FieldView } from './field.ts';
+import { Planner } from './planner.ts';
+import type { Chassis } from '../lib/chassis.ts';
 
 const $ = <T extends HTMLElement>(sel: string): T => document.querySelector(sel) as T;
 
@@ -28,6 +30,7 @@ export class App {
   private config: WorldConfig = defaultConfig();
   private world: World;
   private field: FieldView;
+  private planner!: Planner;
   private epoch = 0;
   private state: RunState = 'idle';
   private keys = new Set<string>();
@@ -38,9 +41,11 @@ export class App {
   constructor() {
     this.world = this.buildWorld();
     this.field = new FieldView($('#field'));
+    this.planner = new Planner(this.field, $('#path-list'), $('#path-code'));
     this.bindControls();
     this.bindEditor();
     this.bindFieldInput();
+    this.bindPlanner();
     this.buildGauges();
     this.buildTuning();
     this.loop();
@@ -95,9 +100,6 @@ export class App {
   // ------------------------------------------------------------------
 
   private runProgram(): void {
-    this.resetWorld(false);
-    this.clearConsole();
-
     const code = ($('#code') as unknown as HTMLTextAreaElement).value;
     const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor as new (
       ...args: string[]
@@ -110,6 +112,13 @@ export class App {
       this.log(`✗ ${String(err)}`, 'error');
       return;
     }
+    this.execute(fn, 'program');
+  }
+
+  /** reset the world and run an autonomous routine against it */
+  private execute(fn: (...fnArgs: unknown[]) => Promise<void>, label: string): void {
+    this.resetWorld(false);
+    this.clearConsole();
 
     const myEpoch = this.epoch;
     const world = this.world;
@@ -120,7 +129,7 @@ export class App {
     };
 
     this.setState('running');
-    this.log('▶ program started', 'info');
+    this.log(`▶ ${label} started`, 'info');
 
     fn(world.chassis, odysseyNs, consoleProxy, (ms: number) => world.clock.delay(ms)).then(
       async () => {
@@ -227,8 +236,15 @@ export class App {
         });
         btn.classList.add('active');
         btn.setAttribute('aria-selected', 'true');
-        $('#tab-auto').classList.toggle('hidden', btn.dataset.tab !== 'auto');
-        $('#tab-tune').classList.toggle('hidden', btn.dataset.tab !== 'tune');
+        for (const name of ['auto', 'path', 'tune']) {
+          $(`#tab-${name}`).classList.toggle('hidden', btn.dataset.tab !== name);
+        }
+        this.planner.active = btn.dataset.tab === 'path';
+        if (this.planner.active) {
+          // the click-target quick actions would fight with point placement
+          this.field.target = null;
+          $('#quick').classList.add('hidden');
+        }
       });
     }
   }
@@ -273,6 +289,7 @@ export class App {
     });
 
     canvas.addEventListener('click', (e) => {
+      if (this.planner.active) return;
       const rect = canvas.getBoundingClientRect();
       let [x, y] = this.field.toField(e.clientX - rect.left, e.clientY - rect.top);
       x = Math.max(-72, Math.min(72, x));
@@ -297,6 +314,39 @@ export class App {
     $('#qa-clear').addEventListener('click', () => {
       this.field.target = null;
       quick.classList.add('hidden');
+    });
+  }
+
+  private bindPlanner(): void {
+    const timeoutInput = $('#path-timeout') as unknown as HTMLInputElement;
+    timeoutInput.addEventListener('input', () => {
+      const v = Number(timeoutInput.value);
+      if (Number.isFinite(v) && v > 0) {
+        this.planner.timeout = v;
+        this.planner.refresh();
+      }
+    });
+
+    $('#path-clear').addEventListener('click', () => this.planner.clear());
+
+    $('#path-run').addEventListener('click', () => {
+      if (this.planner.points.length < 2) {
+        this.log('✗ add a start point and at least one waypoint first', 'error');
+        return;
+      }
+      const program = this.planner.buildProgram();
+      this.execute((chassis: unknown) => program(chassis as Chassis), 'path');
+    });
+
+    $('#path-copy').addEventListener('click', async () => {
+      const btn = $('#path-copy');
+      try {
+        await navigator.clipboard.writeText(this.planner.generateCpp());
+        btn.textContent = 'Copied!';
+      } catch {
+        btn.textContent = 'Copy failed';
+      }
+      setTimeout(() => (btn.textContent = 'Copy'), 1500);
     });
   }
 

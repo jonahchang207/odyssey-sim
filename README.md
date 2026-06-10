@@ -20,6 +20,8 @@
 | --- | --- |
 | ![Dark theme](docs/screenshot-dark.png) | ![Light theme](docs/screenshot-light.png) |
 
+![Path planner](docs/screenshot-planner.png)
+
 ## What it is
 
 The simulator runs a **line-for-line TypeScript port of the Odyssey C++ source** —
@@ -42,6 +44,9 @@ parameters.
 
 - **Field view** — the 12'×12' game field with the robot's true path (amber)
   and odometry's belief (dashed blue ghost + trail)
+- **Path planner** — click waypoints onto the field (drag to refine,
+  right-click to delete), choose point vs. pose arrivals, simulate the
+  route, then copy the generated C++ straight into your autonomous
 - **Code editor** — write autonomous routines against the `chassis` API;
   bundled examples cover every motion type
 - **Tuning panel** — drivetrain geometry, lateral/angular PID, exit

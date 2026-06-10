@@ -739,3 +739,133 @@ input[type='checkbox']:checked::after {
     grid-template-columns: repeat(4, 1fr);
   }
 }
+
+/* ------------------------------------------------------------------ */
+/* path planner                                                        */
+/* ------------------------------------------------------------------ */
+
+.path-hint {
+  margin: 0;
+  font-size: 12.5px;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.path-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.path-toolbar .control input {
+  width: 70px;
+}
+
+.path-list {
+  flex: 1;
+  min-height: 90px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 8px;
+  background: var(--bg);
+  transition: background-color 0.2s ease;
+}
+
+.path-empty {
+  font-size: 12px;
+  color: var(--faint);
+  font-style: italic;
+  padding: 4px 2px;
+}
+
+.path-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.path-row input[type='number'] {
+  width: 58px;
+  min-height: 26px;
+  padding: 3px 6px;
+}
+
+.path-row select {
+  width: 72px;
+  min-height: 26px;
+  padding: 3px 4px;
+}
+
+.path-row input.path-theta {
+  width: 52px;
+}
+
+.path-row input:disabled,
+.path-row select:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.path-badge {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #8b5cf6;
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.path-badge.start {
+  background: #22b573;
+}
+
+.path-kind-label {
+  font-size: 11px;
+  color: var(--faint);
+  width: 72px;
+  flex-shrink: 0;
+}
+
+.path-rev {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.path-del {
+  margin-left: auto;
+}
+
+.path-code-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.path-code {
+  flex: 1;
+  min-height: 130px;
+  margin: 0;
+  overflow: auto;
+  font-size: 11.5px;
+  line-height: 1.55;
+  white-space: pre;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  transition: background-color 0.2s ease;
+}
