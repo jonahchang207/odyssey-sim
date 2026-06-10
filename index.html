@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Odyssey Simulator</title>
+    <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+    <meta name="description" content="Browser simulator for the Odyssey VEX V5 odometry and motion control library" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Courier+Prime:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div id="app">
+      <header class="masthead">
+        <img class="emblem" src="/logo.svg" alt="Odyssey emblem" />
+        <div class="wordmark">
+          <h1>Odyssey</h1>
+          <span class="sub">Simulator</span>
+        </div>
+        <nav>
+          <a href="https://jonahchang207.github.io/odyssey/" target="_blank" rel="noopener">Library docs</a>
+          <a href="https://github.com/jonahchang207/odyssey" target="_blank" rel="noopener">Library repo</a>
+        </nav>
+      </header>
+
+      <main>
+        <section class="stage">
+          <div class="controls plate">
+            <button id="btn-run" class="btn primary" title="Rebuild the robot and run the program">▶ Run</button>
+            <button id="btn-stop" class="btn danger" title="Stop the program, keep the robot where it is">■ Stop</button>
+            <button id="btn-reset" class="btn" title="Rebuild the robot at the origin">⟲ Reset</button>
+            <span class="divider"></span>
+            <label class="control">Speed
+              <select id="speed">
+                <option value="0.5">0.5×</option>
+                <option value="1" selected>1×</option>
+                <option value="2">2×</option>
+                <option value="4">4×</option>
+                <option value="8">8×</option>
+              </select>
+            </label>
+            <label class="control toggle" title="Drive with WASD or arrow keys">
+              <input type="checkbox" id="driver" /> Driver
+            </label>
+            <label class="control toggle" title="Add wheel slip and IMU drift so odometry diverges from reality">
+              <input type="checkbox" id="noise" /> Noise
+            </label>
+            <label class="control toggle" title="Show where odometry believes the robot is">
+              <input type="checkbox" id="ghost" checked /> Ghost
+            </label>
+            <label class="control toggle">
+              <input type="checkbox" id="trails" checked /> Trails
+            </label>
+          </div>
+
+          <div class="field-wrap">
+            <canvas id="field"></canvas>
+            <div id="quick" class="quick plate hidden">
+              <span id="quick-coords" class="mono"></span>
+              <button id="qa-turn" class="btn small">Turn to</button>
+              <button id="qa-move" class="btn small">Move to</button>
+              <button id="qa-pose" class="btn small">Pose</button>
+              <input id="qa-theta" class="mono" type="number" value="0" step="15" title="arrival heading, compass degrees" />°
+              <button id="qa-clear" class="btn small" title="clear target">×</button>
+            </div>
+          </div>
+
+          <div class="gauges" id="gauges"></div>
+        </section>
+
+        <aside class="panel plate">
+          <div class="tabs">
+            <button class="tab-btn active" data-tab="auto">Autonomous</button>
+            <button class="tab-btn" data-tab="tune">Tuning</button>
+          </div>
+
+          <div id="tab-auto" class="tab">
+            <div class="editor-bar">
+              <label>Example
+                <select id="examples"></select>
+              </label>
+            </div>
+            <textarea id="code" class="mono" spellcheck="false"></textarea>
+            <div class="console-title">Console</div>
+            <div id="console" class="console mono"></div>
+          </div>
+
+          <div id="tab-tune" class="tab hidden">
+            <div id="tuning" class="tuning"></div>
+            <div class="tune-actions">
+              <button id="btn-apply" class="btn primary">Apply &amp; rebuild</button>
+              <button id="btn-defaults" class="btn">Defaults</button>
+            </div>
+          </div>
+        </aside>
+      </main>
+
+      <footer class="statusbar">
+        <span id="status-coords" class="mono">—</span>
+        <span id="status-state">IDLE</span>
+        <span id="status-time" class="mono">t = 0.00 s</span>
+      </footer>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 300" width="1060" height="300">
+  <!-- Odyssey banner: emblem + wordmark -->
+  <defs>
+    <linearGradient id="bbrass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e0b54e"/>
+      <stop offset="0.5" stop-color="#c9972c"/>
+      <stop offset="1" stop-color="#8a6420"/>
+    </linearGradient>
+    <linearGradient id="bcopper" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#d28a4d"/>
+      <stop offset="0.55" stop-color="#b87333"/>
+      <stop offset="1" stop-color="#7e4a1d"/>
+    </linearGradient>
+    <linearGradient id="bwood" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#7a5530"/>
+      <stop offset="1" stop-color="#3c2a16"/>
+    </linearGradient>
+    <radialGradient id="bsky" cx="0.5" cy="0.42" r="0.75">
+      <stop offset="0" stop-color="#33281c"/>
+      <stop offset="1" stop-color="#1f1710"/>
+    </radialGradient>
+    <linearGradient id="btext2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#ecc676"/>
+      <stop offset="0.55" stop-color="#c9972c"/>
+      <stop offset="1" stop-color="#96701f"/>
+    </linearGradient>
+    <g id="btooth">
+      <rect x="242" y="4" width="28" height="38" rx="6" fill="url(#bbrass)" stroke="#6b4e1d" stroke-width="3"/>
+    </g>
+  </defs>
+
+  <!-- emblem (scaled copy of logo.svg) -->
+  <g transform="translate(8 8) scale(0.555)">
+    <use href="#btooth"/>
+    <use href="#btooth" transform="rotate(30 256 256)"/>
+    <use href="#btooth" transform="rotate(60 256 256)"/>
+    <use href="#btooth" transform="rotate(90 256 256)"/>
+    <use href="#btooth" transform="rotate(120 256 256)"/>
+    <use href="#btooth" transform="rotate(150 256 256)"/>
+    <use href="#btooth" transform="rotate(180 256 256)"/>
+    <use href="#btooth" transform="rotate(210 256 256)"/>
+    <use href="#btooth" transform="rotate(240 256 256)"/>
+    <use href="#btooth" transform="rotate(270 256 256)"/>
+    <use href="#btooth" transform="rotate(300 256 256)"/>
+    <use href="#btooth" transform="rotate(330 256 256)"/>
+    <circle cx="256" cy="256" r="234" fill="url(#bbrass)" stroke="#6b4e1d" stroke-width="4"/>
+    <circle cx="256" cy="256" r="200" fill="url(#bsky)" stroke="#5a3c14" stroke-width="4"/>
+    <circle cx="256" cy="256" r="190" fill="none" stroke="#caa04a" stroke-width="2" stroke-dasharray="3 9" opacity="0.7"/>
+    <circle cx="142" cy="118" r="2.5" fill="#f1e3c5" opacity="0.8"/>
+    <circle cx="362" cy="104" r="2" fill="#f1e3c5" opacity="0.6"/>
+    <circle cx="402" cy="280" r="2" fill="#f1e3c5" opacity="0.55"/>
+    <circle cx="110" cy="300" r="2" fill="#f1e3c5" opacity="0.55"/>
+    <path d="M132 166 L94 144 L106 192 Z" fill="#8a5a2b" stroke="#5a3c14" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M132 230 L94 252 L106 204 Z" fill="#8a5a2b" stroke="#5a3c14" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="256" cy="198" rx="138" ry="60" fill="url(#bcopper)" stroke="#5a3c14" stroke-width="4"/>
+    <path d="M196 145 C188 180 188 216 196 251" fill="none" stroke="#5a3c14" stroke-width="2.5" opacity="0.6"/>
+    <path d="M256 139 C252 178 252 218 256 257" fill="none" stroke="#5a3c14" stroke-width="2.5" opacity="0.6"/>
+    <path d="M316 145 C324 180 324 216 316 251" fill="none" stroke="#5a3c14" stroke-width="2.5" opacity="0.6"/>
+    <path d="M150 172 C190 148 322 148 362 172" fill="none" stroke="#e8c98f" stroke-width="5" opacity="0.45" stroke-linecap="round"/>
+    <circle cx="392" cy="198" r="13" fill="url(#bbrass)" stroke="#5a3c14" stroke-width="3"/>
+    <line x1="392" y1="186" x2="392" y2="152" stroke="#5a3c14" stroke-width="3"/>
+    <path d="M392 152 L424 161 L392 171 Z" fill="#8f2f25" stroke="#5a3c14" stroke-width="2" stroke-linejoin="round"/>
+    <line x1="206" y1="248" x2="220" y2="301" stroke="#6b4e1d" stroke-width="3"/>
+    <line x1="306" y1="248" x2="292" y2="301" stroke="#6b4e1d" stroke-width="3"/>
+    <line x1="256" y1="257" x2="256" y2="301" stroke="#6b4e1d" stroke-width="3"/>
+    <g transform="rotate(28 170 326)">
+      <ellipse cx="170" cy="308" rx="6.5" ry="16" fill="#9a7022" stroke="#5a3c14" stroke-width="2"/>
+      <ellipse cx="170" cy="344" rx="6.5" ry="16" fill="#9a7022" stroke="#5a3c14" stroke-width="2"/>
+    </g>
+    <circle cx="170" cy="326" r="7" fill="url(#bbrass)" stroke="#5a3c14" stroke-width="2"/>
+    <path d="M180 300 L332 300 Q341 300 338 311 Q328 346 282 352 L230 352 Q184 346 174 311 Q171 300 180 300 Z"
+          fill="url(#bwood)" stroke="#2f2010" stroke-width="4"/>
+    <line x1="178" y1="310" x2="334" y2="310" stroke="#caa04a" stroke-width="2.5" opacity="0.8"/>
+    <circle cx="222" cy="328" r="9" fill="#f7ecd2" stroke="#8a6420" stroke-width="3.5"/>
+    <circle cx="256" cy="330" r="9" fill="#f7ecd2" stroke="#8a6420" stroke-width="3.5"/>
+    <circle cx="290" cy="328" r="9" fill="#f7ecd2" stroke="#8a6420" stroke-width="3.5"/>
+  </g>
+
+  <!-- wordmark -->
+  <text x="330" y="158" font-family="Georgia, 'Times New Roman', serif" font-size="116" font-weight="bold"
+        letter-spacing="10" fill="url(#btext2)" stroke="#5a3c14" stroke-width="2">ODYSSEY</text>
+  <line x1="334" y1="196" x2="640" y2="196" stroke="#8a6420" stroke-width="3"/>
+  <circle cx="660" cy="196" r="6" fill="none" stroke="#8a6420" stroke-width="3"/>
+  <line x1="680" y1="196" x2="1006" y2="196" stroke="#8a6420" stroke-width="3"/>
+  <text x="334" y="238" font-family="Georgia, 'Times New Roman', serif" font-size="27"
+        letter-spacing="5" fill="#9a8460">ODOMETRY &amp; MOTION CONTROL FOR VEX V5</text>
+</svg>
