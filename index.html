@@ -6,35 +6,72 @@
     <title>Odyssey Simulator</title>
     <link rel="icon" type="image/svg+xml" href="/logo.svg" />
     <meta name="description" content="Browser simulator for the Odyssey VEX V5 odometry and motion control library" />
+    <script>
+      // set the theme before first paint: saved choice, else system preference
+      (function () {
+        var fromUrl = new URLSearchParams(location.search).get('theme');
+        var saved = localStorage.getItem('odyssey-theme');
+        var theme =
+          fromUrl === 'light' || fromUrl === 'dark'
+            ? fromUrl
+            : saved === 'light' || saved === 'dark'
+              ? saved
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light';
+        document.documentElement.dataset.theme = theme;
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
   </head>
   <body>
+    <svg width="0" height="0" style="position: absolute" aria-hidden="true">
+      <defs>
+        <symbol id="i-play" viewBox="0 0 24 24"><polygon points="6 3 20 12 6 21 6 3" /></symbol>
+        <symbol id="i-stop" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="14" rx="1.5" /></symbol>
+        <symbol id="i-reset" viewBox="0 0 24 24"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></symbol>
+        <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18" /><path d="m6 6 12 12" /></symbol>
+        <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" /><path d="M12 2v2" /><path d="M12 20v2" /><path d="m4.93 4.93 1.41 1.41" /><path d="m17.66 17.66 1.41 1.41" /><path d="M2 12h2" /><path d="M20 12h2" /><path d="m6.34 17.66-1.41 1.41" /><path d="m19.07 4.93-1.41 1.41" /></symbol>
+        <symbol id="i-moon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></symbol>
+      </defs>
+    </svg>
+
     <div id="app">
       <header class="masthead">
-        <img class="emblem" src="/logo.svg" alt="Odyssey emblem" />
+        <img class="emblem" src="/logo.svg" alt="Odyssey logo" />
         <div class="wordmark">
           <h1>Odyssey</h1>
           <span class="sub">Simulator</span>
         </div>
-        <nav>
+        <nav aria-label="External links">
           <a href="https://jonahchang207.github.io/odyssey/" target="_blank" rel="noopener">Library docs</a>
           <a href="https://github.com/jonahchang207/odyssey" target="_blank" rel="noopener">Library repo</a>
+          <button id="theme-toggle" class="icon-btn" aria-label="Toggle light and dark theme">
+            <svg class="only-dark" aria-hidden="true"><use href="#i-sun" /></svg>
+            <svg class="only-light" aria-hidden="true"><use href="#i-moon" /></svg>
+          </button>
         </nav>
       </header>
 
       <main>
         <section class="stage">
           <div class="controls plate">
-            <button id="btn-run" class="btn primary" title="Rebuild the robot and run the program">▶ Run</button>
-            <button id="btn-stop" class="btn danger" title="Stop the program, keep the robot where it is">■ Stop</button>
-            <button id="btn-reset" class="btn" title="Rebuild the robot at the origin">⟲ Reset</button>
-            <span class="divider"></span>
-            <label class="control">Speed
+            <button id="btn-run" class="btn primary" title="Rebuild the robot and run the program">
+              <svg aria-hidden="true"><use href="#i-play" /></svg>Run
+            </button>
+            <button id="btn-stop" class="btn danger" title="Stop the program, keep the robot where it is">
+              <svg aria-hidden="true"><use href="#i-stop" /></svg>Stop
+            </button>
+            <button id="btn-reset" class="btn" title="Rebuild the robot at the origin">
+              <svg aria-hidden="true"><use href="#i-reset" /></svg>Reset
+            </button>
+            <span class="divider" role="separator"></span>
+            <label class="control" for="speed">Speed
               <select id="speed">
                 <option value="0.5">0.5×</option>
                 <option value="1" selected>1×</option>
@@ -58,14 +95,18 @@
           </div>
 
           <div class="field-wrap">
-            <canvas id="field"></canvas>
+            <canvas id="field" aria-label="Field view: robot position, trails and targets"></canvas>
             <div id="quick" class="quick plate hidden">
               <span id="quick-coords" class="mono"></span>
               <button id="qa-turn" class="btn small">Turn to</button>
               <button id="qa-move" class="btn small">Move to</button>
               <button id="qa-pose" class="btn small">Pose</button>
-              <input id="qa-theta" class="mono" type="number" value="0" step="15" title="arrival heading, compass degrees" />°
-              <button id="qa-clear" class="btn small" title="clear target">×</button>
+              <label class="control" for="qa-theta">
+                <input id="qa-theta" class="mono" type="number" value="0" step="15" title="Arrival heading, compass degrees" />°
+              </label>
+              <button id="qa-clear" class="btn small icon-only" aria-label="Clear target">
+                <svg aria-hidden="true"><use href="#i-x" /></svg>
+              </button>
             </div>
           </div>
 
@@ -73,20 +114,20 @@
         </section>
 
         <aside class="panel plate">
-          <div class="tabs">
-            <button class="tab-btn active" data-tab="auto">Autonomous</button>
-            <button class="tab-btn" data-tab="tune">Tuning</button>
+          <div class="tabs" role="tablist">
+            <button class="tab-btn active" data-tab="auto" role="tab" aria-selected="true">Autonomous</button>
+            <button class="tab-btn" data-tab="tune" role="tab" aria-selected="false">Tuning</button>
           </div>
 
           <div id="tab-auto" class="tab">
             <div class="editor-bar">
-              <label>Example
+              <label for="examples">Example
                 <select id="examples"></select>
               </label>
             </div>
-            <textarea id="code" class="mono" spellcheck="false"></textarea>
-            <div class="console-title">Console</div>
-            <div id="console" class="console mono"></div>
+            <textarea id="code" class="mono" spellcheck="false" aria-label="Autonomous program code"></textarea>
+            <div class="console-title" id="console-label">Console</div>
+            <div id="console" class="console mono" role="log" aria-live="polite" aria-labelledby="console-label"></div>
           </div>
 
           <div id="tab-tune" class="tab hidden">

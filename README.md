@@ -16,7 +16,9 @@
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-8a6420"></a>
 </p>
 
-![Simulator screenshot](docs/screenshot.png)
+| Dark | Light |
+| --- | --- |
+| ![Dark theme](docs/screenshot-dark.png) | ![Light theme](docs/screenshot-light.png) |
 
 ## What it is
 
@@ -50,6 +52,8 @@ parameters.
 - **Click-to-move** — click the field for instant `turnToPoint`,
   `moveToPoint`, and `moveToPose` targets
 - **0.5×–8× simulation speed**
+- **Light & dark themes** — follows your system preference, with a manual
+  toggle in the header
 
 ## Running it
 

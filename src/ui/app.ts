@@ -167,6 +167,13 @@ export class App {
   // ------------------------------------------------------------------
 
   private bindControls(): void {
+    $('#theme-toggle').addEventListener('click', () => {
+      const root = document.documentElement;
+      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
+      root.dataset.theme = next;
+      localStorage.setItem('odyssey-theme', next);
+    });
+
     $('#btn-run').addEventListener('click', () => this.runProgram());
     $('#btn-stop').addEventListener('click', () => this.stopProgram());
     $('#btn-reset').addEventListener('click', () => {
@@ -214,8 +221,12 @@ export class App {
     // tabs
     for (const btn of document.querySelectorAll<HTMLButtonElement>('.tab-btn')) {
       btn.addEventListener('click', () => {
-        document.querySelectorAll('.tab-btn').forEach((b) => b.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach((b) => {
+          b.classList.remove('active');
+          b.setAttribute('aria-selected', 'false');
+        });
         btn.classList.add('active');
+        btn.setAttribute('aria-selected', 'true');
         $('#tab-auto').classList.toggle('hidden', btn.dataset.tab !== 'auto');
         $('#tab-tune').classList.toggle('hidden', btn.dataset.tab !== 'tune');
       });
